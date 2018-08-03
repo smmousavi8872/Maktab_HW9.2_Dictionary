@@ -1,3 +1,7 @@
 <resources>
-  <string name="app_name">Maktab_HW9.2_Dictionary</string>
+  <string name="app_name">Dictionary</string>
+
+  <string name="persian_language_name">Persian</string>
+  <string name="english_language_name">English</string>
+  <string name="spanish_language_name">Spanish</string>
 </resources>
