@@ -36,6 +36,14 @@ public class Translation {
   }
 
 
+  public void setFrom(String from) {
+    this.from = from;
+  }
+
+  public void setTo(String to) {
+    this.to = to;
+  }
+
   public String getTo() {
     return to;
   }
@@ -43,6 +51,10 @@ public class Translation {
 
   public String getTranslationText() {
     return translationText;
+  }
+
+  public void setTranslationText(String translationText) {
+    this.translationText = translationText;
   }
 
 

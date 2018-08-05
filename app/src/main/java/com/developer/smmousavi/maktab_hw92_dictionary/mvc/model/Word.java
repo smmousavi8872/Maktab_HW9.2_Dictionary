@@ -31,6 +31,10 @@ public class Word {
     return text;
   }
 
+  public void setText(String text) {
+    this.text = text;
+  }
+
 
   public String getVerbal() {
     return verbal;

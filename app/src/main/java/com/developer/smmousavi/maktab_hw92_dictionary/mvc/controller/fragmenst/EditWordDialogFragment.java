@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -55,8 +54,6 @@ public class EditWordDialogFragment extends DialogFragment {
   private String toLanguage;
   private UUID currentWordId;
 
-  private String changedFromLanguage;
-
   private Repository repository;
 
   public EditWordDialogFragment() {
@@ -91,7 +88,9 @@ public class EditWordDialogFragment extends DialogFragment {
     fromLanguage = args.getString(FROM_ARGS);
     toLanguage = args.getString(TO_ARGS);
     repository = Repository.getInstance(getActivity());
-    changedFromLanguage = fromLanguage;
+
+    radioGroupTo.setEnabled(false);
+    radioGroupFrom.setEnabled(false);
 
     switch (fromLanguage) {
       case PERSIAN_NAME:
@@ -114,23 +113,7 @@ public class EditWordDialogFragment extends DialogFragment {
       .setPositiveButton("update", null)
       .create();
 
-    radioGroupTo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        setTranslationTitles(checkedId);
-        switch (checkedId) {
-          case R.id.edit_dialog_from_english_radio:
-            changedFromLanguage = getString(R.string.english_language_name);
-            break;
-          case R.id.edit_dialog_from_persian_radio:
-            changedFromLanguage = getString(R.string.persian_language_name);
-            break;
-          case R.id.edit_dialog_from_spanish_radio:
-            changedFromLanguage = getString(R.string.spanish_language_name);
-            break;
-        }
-      }
-    });
+
     return dialog;
   }
 
@@ -247,37 +230,31 @@ public class EditWordDialogFragment extends DialogFragment {
     okBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Log.i("TAG7", fromLanguage + " = " + changedFromLanguage);
-        if (fromLanguage.equals(changedFromLanguage)) {
-          switch (fromLanguage) {
-            case PERSIAN_NAME:
-              if (!wordTextEdt.getText().toString().equals("")) {
-                updatePersianWord();
+        switch (fromLanguage) {
+          case PERSIAN_NAME:
+            if (!wordTextEdt.getText().toString().equals("")) {
+              updatePersianWord();
 
-              } else
-                wordTextTxt.setTextColor(Color.RED);
+            } else
+              wordTextTxt.setTextColor(Color.RED);
 
-              break;
-            case ENGLISH_NAME:
-              if (!wordTextEdt.getText().toString().equals("")) {
-                updateEnglishWord();
+            break;
+          case ENGLISH_NAME:
+            if (!wordTextEdt.getText().toString().equals("")) {
+              updateEnglishWord();
 
-              } else
-                wordTextTxt.setTextColor(Color.RED);
+            } else
+              wordTextTxt.setTextColor(Color.RED);
 
-              break;
-            case SPANISH_NAME:
-              if (!wordTextEdt.getText().toString().equals("")) {
-                updateSpanishWord();
+            break;
+          case SPANISH_NAME:
+            if (!wordTextEdt.getText().toString().equals("")) {
+              updateSpanishWord();
 
-              } else
-                wordTextTxt.setTextColor(Color.RED);
-          }
-          dismiss();
-
-        } else {
-
+            } else
+              wordTextTxt.setTextColor(Color.RED);
         }
+        dismiss();
       }
     });
   }
@@ -286,8 +263,8 @@ public class EditWordDialogFragment extends DialogFragment {
   private void updateEnglishWord() {
     EnglishWord lastWord = repository.getEnglishWord(currentWordId);
     EnglishWord englishWord = new EnglishWord(wordTextEdt.getText().toString(), currentWordId);
-    Translation persianTranslation = new Translation(lastWord.getPersianTranslationId(), fromLanguage, toLanguage, firstTranslationEdt.getText().toString());
-    Translation spanishTranslation = new Translation(lastWord.getSpanishTranslationId(), fromLanguage, toLanguage, secondTranslationEdt.getText().toString());
+    Translation persianTranslation = new Translation(lastWord.getPersianTranslationId(), ENGLISH_NAME, PERSIAN_NAME, firstTranslationEdt.getText().toString());
+    Translation spanishTranslation = new Translation(lastWord.getSpanishTranslationId(), ENGLISH_NAME, SPANISH_NAME, secondTranslationEdt.getText().toString());
     englishWord.setVerbal(wordVerbalEdt.getText().toString());
     englishWord.setPersianTranslationId(persianTranslation.getTranslationId());
     englishWord.setSpanishTranslationId(spanishTranslation.getTranslationId());
@@ -298,11 +275,12 @@ public class EditWordDialogFragment extends DialogFragment {
     repository.updateTranslation(spanishTranslation);
   }
 
+
   private void updatePersianWord() {
     PersianWord lastWord = repository.getPersianWord(currentWordId);
     PersianWord persianWord = new PersianWord(wordTextEdt.getText().toString(), currentWordId);
-    Translation englishTranslation = new Translation(lastWord.getEnglishTranslationId(), fromLanguage, toLanguage, firstTranslationEdt.getText().toString());
-    Translation spanishTranslation = new Translation(lastWord.getSpanishTranslationId(), fromLanguage, toLanguage, secondTranslationEdt.getText().toString());
+    Translation englishTranslation = new Translation(lastWord.getEnglishTranslationId(), PERSIAN_NAME, ENGLISH_NAME, firstTranslationEdt.getText().toString());
+    Translation spanishTranslation = new Translation(lastWord.getSpanishTranslationId(), PERSIAN_NAME, SPANISH_NAME, secondTranslationEdt.getText().toString());
     persianWord.setVerbal(wordVerbalEdt.getText().toString());
     persianWord.setEnglishTranslationId(englishTranslation.getTranslationId());
     persianWord.setSpanishTranslationId(spanishTranslation.getTranslationId());
@@ -317,8 +295,8 @@ public class EditWordDialogFragment extends DialogFragment {
   private void updateSpanishWord() {
     SpanishWord lastWord = repository.getSpanishWord(currentWordId);
     SpanishWord spanishWord = new SpanishWord(wordTextEdt.getText().toString(), currentWordId);
-    Translation persianTranslation = new Translation(lastWord.getPersianTranslationId(), fromLanguage, toLanguage, firstTranslationEdt.getText().toString());
-    Translation englishTranslation = new Translation(lastWord.getEnglishTranslationId(), fromLanguage, toLanguage, secondTranslationEdt.getText().toString());
+    Translation persianTranslation = new Translation(lastWord.getPersianTranslationId(), SPANISH_NAME, PERSIAN_NAME, firstTranslationEdt.getText().toString());
+    Translation englishTranslation = new Translation(lastWord.getEnglishTranslationId(), SPANISH_NAME, ENGLISH_NAME, secondTranslationEdt.getText().toString());
     spanishWord.setVerbal(wordVerbalEdt.getText().toString());
     spanishWord.setPersianTranslationId(persianTranslation.getTranslationId());
     spanishWord.setEnglishTranslationId(englishTranslation.getTranslationId());
