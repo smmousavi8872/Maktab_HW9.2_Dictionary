@@ -50,6 +50,7 @@ public class Repository {
   private Repository(Context context) {
     DatabaseHelper database = new DatabaseHelper(context);
     sqliteDB = database.getWritableDatabase();
+    this.context = context;
 
     // to avoid creating tables every time that the app is launched
     if (getTableCount(PersianWordTable.NAME) < 1)
@@ -118,6 +119,7 @@ public class Repository {
     return foundWords;
   }
 
+
   public List<Word> searchSpanishWordByInitial(String englishInitial) {
     List<Word> foundWords = new ArrayList<>();
     String whereClause = SpanishWordTable.Cols.INITIAL_CHAR + " = ? ";
@@ -136,6 +138,48 @@ public class Repository {
       }
     }
     return foundWords;
+  }
+
+
+  public EnglishWord getEnglishWord(UUID wordId) {
+    String whereClause = EnglishWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {wordId.toString()};
+
+    try (EnglishCursorWrapper cursorWrapper = (EnglishCursorWrapper) getQuery(EnglishWordTable.NAME, whereClause, whereArgs)) {
+      if (cursorWrapper.getCount() == 0)
+        return null;
+
+      cursorWrapper.moveToFirst();
+      return cursorWrapper.getEnglishWord();
+    }
+
+  }
+
+
+  public PersianWord getPersianWord(UUID wordId) {
+    String whereClause = PersianWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {wordId.toString()};
+
+    try (PersianCursorWrapper cursorWrapper = (PersianCursorWrapper) getQuery(PersianWordTable.NAME, whereClause, whereArgs)) {
+      if (cursorWrapper.getCount() == 0)
+        return null;
+
+      cursorWrapper.moveToFirst();
+      return cursorWrapper.getPersianWord();
+    }
+  }
+
+
+  public SpanishWord getSpanishWord(UUID wordId) {
+    String whereClause = SpanishWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {wordId.toString()};
+    try (SpanishCursorWrapper cursorWrapper = (SpanishCursorWrapper) getQuery(SpanishWordTable.NAME, whereClause, whereArgs)) {
+      if (cursorWrapper.getCount() == 0)
+        return null;
+
+      cursorWrapper.moveToFirst();
+      return cursorWrapper.getSpanishWord();
+    }
   }
 
 
@@ -160,6 +204,73 @@ public class Repository {
   public void addTranslation(Translation translation) {
     ContentValues values = getTranslationsContentValue(translation);
     sqliteDB.insert(TranslationTable.NAME, null, values);
+  }
+
+
+  public void updateEnglishWord(EnglishWord word) {
+    ContentValues values = getEnglishWordContentValues(word);
+    String whereClause = EnglishWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {word.getId().toString()};
+    sqliteDB.update(EnglishWordTable.NAME, values, whereClause, whereArgs);
+  }
+
+
+  public void updatePersainWord(PersianWord word) {
+    ContentValues values = getPersianWordContentValues(word);
+    String whereClause = PersianWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {word.getId().toString()};
+    sqliteDB.update(PersianWordTable.NAME, values, whereClause, whereArgs);
+  }
+
+
+  public void updateSpanishWord(SpanishWord word) {
+    ContentValues values = getSpanishWordContentValues(word);
+    String whereClause = SpanishWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {word.getId().toString()};
+    sqliteDB.update(SpanishWordTable.NAME, values, whereClause, whereArgs);
+  }
+
+
+  public void updateTranslation(Translation translation) {
+    ContentValues values = getTranslationsContentValue(translation);
+    String whereClasue = TranslationTable.Cols.TRANSLATION_ID + " = ? ";
+    String[] whereArgs = {translation.getTranslationId().toString()};
+    sqliteDB.update(TranslationTable.NAME, values, whereClasue, whereArgs);
+  }
+
+
+  public void removeEnglishWord(EnglishWord englishWord) {
+    String whereClause = EnglishWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {englishWord.getId().toString()};
+    sqliteDB.delete(EnglishWordTable.NAME, whereClause, whereArgs);
+  }
+
+
+  public void removePersianWord(PersianWord persianWord) {
+    String whereClause = PersianWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {persianWord.getId().toString()};
+    sqliteDB.delete(PersianWordTable.NAME, whereClause, whereArgs);
+  }
+
+
+  public void removeSpanishWord(SpanishWord spanishWord) {
+    String whereClause = SpanishWordTable.Cols.UUID + " = ? ";
+    String[] whereArgs = {spanishWord.getId().toString()};
+    sqliteDB.delete(SpanishWordTable.NAME, whereClause, whereArgs);
+  }
+
+
+  public Translation getTranslation(UUID translationId) {
+    String whereClause = TranslationTable.Cols.TRANSLATION_ID + " = ? ";
+    String[] whereArgs = {translationId.toString()};
+    try (TranslationCursorWrapper cursorWrapper = (TranslationCursorWrapper) getQuery(TranslationTable.NAME, whereClause, whereArgs)) {
+      if (cursorWrapper.getCount() == 0)
+        return null;
+
+      cursorWrapper.moveToFirst();
+      return cursorWrapper.getTranslation();
+    }
+
   }
 
 
@@ -197,8 +308,8 @@ public class Repository {
     values.put(PersianWordTable.Cols.INITIAL_CHAR, word.getTextSubstring(1));
     values.put(PersianWordTable.Cols.VERBAL, word.getVerbal());
     values.put(PersianWordTable.Cols.SEARCH_TIMES, word.getSearchedTimes());
-    values.put(PersianWordTable.Cols.SPANISH_TRANSLATION_UUID, word.getEnglishTranslationId().toString());
-    values.put(PersianWordTable.Cols.ENGLISH_TRANSLATION_UUID, word.getSpanishTranslationId().toString());
+    values.put(PersianWordTable.Cols.ENGLISH_TRANSLATION_UUID, word.getEnglishTranslationId().toString());
+    values.put(PersianWordTable.Cols.SPANISH_TRANSLATION_UUID, word.getSpanishTranslationId().toString());
 
     return values;
   }
@@ -245,7 +356,8 @@ public class Repository {
   }
 
 
-  public void createPersianWord(String wordText, String wordVerbal, String englishTranslation, String spanishTranslation) {
+  public void createPersianWord(String wordText, String wordVerbal, String
+    englishTranslation, String spanishTranslation) {
     PersianWord persianWord = new PersianWord(wordText);
     UUID englishTranslationId = createPersianToEnglishTranslation(persianWord.getId(), englishTranslation);
     UUID spanishTranslationId = createPersianToSpanishTranslation(persianWord.getId(), spanishTranslation);
@@ -281,7 +393,8 @@ public class Repository {
   }
 
 
-  public void createEnglishWord(String wordText, String wordVerbal, String persianTranslation, String spanishTranslation) {
+  public void createEnglishWord(String wordText, String wordVerbal, String
+    persianTranslation, String spanishTranslation) {
     EnglishWord englishWord = new EnglishWord(wordText);
     UUID persianTranslationId = createEnglishToPersianTranslation(englishWord.getId(), persianTranslation);
     UUID spanishTranslationId = createEnglishToSpanishTranslation(englishWord.getId(), spanishTranslation);
@@ -318,7 +431,8 @@ public class Repository {
   }
 
 
-  public void createWord(String wordText, String wordVerbal, String persianTranslation, String englishTranslation) {
+  public void createWord(String wordText, String wordVerbal, String persianTranslation, String
+    englishTranslation) {
     SpanishWord espanishWord = new SpanishWord(wordText);
     UUID persianTranslationId = createSpanishToPersianTranslation(espanishWord.getId(), persianTranslation);
     UUID englishTranslationId = createSpanishToEnglishTranslation(espanishWord.getId(), englishTranslation);

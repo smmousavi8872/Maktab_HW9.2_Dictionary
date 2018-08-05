@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@drawable/border_without_radius"
+  android:orientation="vertical"
+  android:paddingBottom="7dp"
+  android:paddingEnd="20dp"
+  android:paddingStart="20dp"
+  android:paddingTop="15dp"
+  tools:context=".mvc.controller.fragmenst.ShowWordMeaningFragment">
+
+  <LinearLayout
+    android:id="@+id/word_text_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+      android:id="@+id/txt_word"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:drawableStart="@drawable/key"
+      android:text="new"
+      android:textColor="#CC0000"
+      android:textSize="26dp"
+      android:textStyle="bold"/>
+
+    <TextView
+      android:id="@+id/txt_phonotics"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="10dp"
+      android:textColor="#CC0000"
+      android:textSize="24dp"/>
+  </LinearLayout>
+
+  <TextView
+    android:id="@+id/txt_verbal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    android:text="adjective"/>
+
+  <LinearLayout
+    android:id="@+id/definition_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="40dp"
+    android:layout_marginTop="20dp"
+    android:orientation="horizontal">
+
+    <TextView
+      android:id="@+id/txt_definition_number"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="5dp"
+      android:text="1."
+      android:textSize="18dp"
+      android:textStyle="bold"/>
+
+    <TextView
+      android:id="@+id/txt_definition"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="oposit of old"
+      android:textColor="#000"
+      android:textSize="18dp"/>
+
+  </LinearLayout>
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:text="All rights reserved to Mousavi English Press @2018"
+    android:textSize="12dp"/>
+</LinearLayout>

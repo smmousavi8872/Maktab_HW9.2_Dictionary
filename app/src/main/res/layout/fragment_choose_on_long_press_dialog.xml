@@ -1,0 +1,58 @@
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:layout_margin="16dp"
+  android:gravity="center"
+  android:orientation="vertical">
+
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    tools:context=".mvc.controller.fragments.LevelChooseDialogFragment">
+
+    <Button
+      android:id="@+id/btn_delete_word"
+      android:layout_width="match_parent"
+      android:layout_height="45dp"
+      android:layout_margin="5dp"
+      android:background="@drawable/border"
+      android:drawableEnd="@drawable/ic_delete_black_24dp"
+      android:gravity="center"
+      android:padding="10dp"
+      android:tag="delete"
+      android:text="Delete"
+      android:textSize="18dp"/>
+
+    <Button
+      android:id="@+id/btn_edit_word"
+      android:layout_width="match_parent"
+      android:layout_height="45dp"
+      android:layout_below="@id/btn_delete_word"
+      android:layout_margin="5dp"
+      android:background="@drawable/border"
+      android:drawableEnd="@drawable/ic_edit_black_24dp"
+      android:gravity="center"
+      android:padding="10dp"
+      android:tag="edit"
+      android:text="Edit"
+      android:textSize="18dp"/>
+
+    <Button
+      android:id="@+id/btn_share_word"
+      android:layout_width="match_parent"
+      android:layout_height="45dp"
+      android:layout_below="@id/btn_edit_word"
+      android:layout_margin="5dp"
+      android:background="@drawable/border"
+      android:drawableEnd="@drawable/ic_share_black_24dp"
+      android:gravity="center"
+      android:padding="10dp"
+      android:tag="share"
+      android:text="Share"
+      android:textSize="18dp"/>
+  </RelativeLayout>
+</LinearLayout>

@@ -10,21 +10,24 @@ public class Translation {
   private UUID wordId;
   private String translationText;
 
-
-  public UUID getTranslationId() {
-    return translationId;
-  }
-
-
-  public void setTranslationId(UUID translationId) {
-    this.translationId = translationId;
-  }
-
   public Translation(String from, String to, String translationText) {
     translationId = UUID.randomUUID();
     this.from = from;
     this.to = to;
     this.translationText = translationText;
+  }
+
+
+  public Translation(UUID translationId, String from, String to, String translationText) {
+    this.translationId = translationId;
+    this.from = from;
+    this.to = to;
+    this.translationText = translationText;
+  }
+
+
+  public UUID getTranslationId() {
+    return translationId;
   }
 
 

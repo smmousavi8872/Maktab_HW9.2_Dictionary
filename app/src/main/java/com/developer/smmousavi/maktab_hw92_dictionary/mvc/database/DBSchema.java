@@ -56,9 +56,9 @@ public class DBSchema {
 
     public static final class Cols {
       public static final String TRANSLATION_ID = "translation_id";
+      public static final String WORD_ID = "word_id";
       public static final String FROM = "from_language";
       public static final String TO = "to_language";
-      public static final String WORD_ID = "word_id";
       public static final String TRANSLATION_TEXT = "translation_text";
     }
 

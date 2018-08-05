@@ -5,7 +5,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical"
-  tools:context=".mvc.controller.fragmenst.WordShowFragment">
+  tools:context=".mvc.controller.fragmenst.WordsListShowFragment">
 
   <FrameLayout
     android:layout_width="match_parent"
@@ -109,14 +109,27 @@
   </LinearLayout>
 
 
-  <android.support.v7.widget.RecyclerView
-    android:id="@+id/result_recycler_view"
+  <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="10dp"
-    >
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp">
 
-  </android.support.v7.widget.RecyclerView>
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/result_recycler_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      >
+    </android.support.v7.widget.RecyclerView>
+
+    <android.support.design.widget.FloatingActionButton
+      android:id="@+id/add_word_fab"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBottom="@+id/result_recycler_view"
+      android:layout_alignEnd="@+id/result_recycler_view"
+      android:layout_margin="16dp"
+      android:foreground="@drawable/ic_add"/>
+  </RelativeLayout>
 
 
 </LinearLayout>
