@@ -65,7 +65,7 @@ public class Word {
   }
 
 
-  public String getTextSubstring(int endIndex) {
+  public String getTextSubstring(int endIndex) throws StringIndexOutOfBoundsException {
     return text.substring(0, endIndex);
   }
 }

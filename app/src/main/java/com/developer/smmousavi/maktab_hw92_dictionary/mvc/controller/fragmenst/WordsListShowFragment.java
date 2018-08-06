@@ -66,6 +66,7 @@ public class WordsListShowFragment extends Fragment {
   private FloatingActionButton addWordFab;
 
   private List<Word> showingWordList = new ArrayList<>();
+  private List<Word> searchedByInitialList = new ArrayList<>();
   private String from;
   private String to;
   private FromStatus fromStatus = FromStatus.ENGLISH;
@@ -90,11 +91,12 @@ public class WordsListShowFragment extends Fragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     repository = Repository.getInstance(getActivity());
+
   }// end of onCreate()
 
 
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+  public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_word_show, container, false);
@@ -117,21 +119,26 @@ public class WordsListShowFragment extends Fragment {
     radioGroupFrom.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        String inputText = searchEdt.getText().toString().toLowerCase();
         switch (checkedId) {
           case R.id.from_english_radio:
+            String inputText = searchEdt.getText().toString().toLowerCase();
             fromStatus = FromStatus.ENGLISH;
             from = getString(R.string.english_language_name);
+            updateWordList(inputText);
             onCheckedRadioChangeSearch(inputText);
             break;
           case R.id.from_persian_radio:
+            inputText = searchEdt.getText().toString().toLowerCase();
             fromStatus = FromStatus.PERSIAN;
             from = getString(R.string.persian_language_name);
+            updateWordList(inputText);
             onCheckedRadioChangeSearch(inputText);
             break;
           case R.id.from_spanish_radio:
+            inputText = searchEdt.getText().toString().toLowerCase();
             fromStatus = FromStatus.SPANISH;
             from = getString(R.string.spanish_language_name);
+            updateWordList(inputText);
             onCheckedRadioChangeSearch(inputText);
             break;
         }
@@ -167,25 +174,9 @@ public class WordsListShowFragment extends Fragment {
       @Override
       public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         String inputText = searchEdt.getText().toString().toLowerCase();
-        if (inputText.equals("")) {
-          showingWordList = new ArrayList<>();
-          setupWordAdapter();
+        updateWordList(inputText);
 
-        } else if (inputText.length() == 1) {
-          onCheckedRadioChangeSearch(inputText);
-
-        } else if (inputText.length() > 1) {
-          showingWordList = searchTheWordList(inputText);
-          Collections.sort(showingWordList, new Comparator<Word>() {
-            @Override
-            public int compare(Word word1, Word word2) {
-              String s1 = word1.getText();
-              String s2 = word2.getText();
-              return s1.compareToIgnoreCase(s2);
-            }
-          });
-          setupWordAdapter();
-        }
+        setupWordAdapter();
       }
 
       @Override
@@ -193,49 +184,56 @@ public class WordsListShowFragment extends Fragment {
 
       }
     });
-
     return view;
+  }
+
+
+  private void updateWordList(String inputText) {
+    if (inputText.length() == 0) {
+      showingWordList = new ArrayList<>();
+      searchedByInitialList = new ArrayList<>();
+
+    } else if (inputText.length() == 1) {
+      onCheckedRadioChangeSearch(inputText);
+      showingWordList = searchTheWordList(inputText);
+
+    } else if (inputText.length() > 1) {
+      showingWordList = searchTheWordList(inputText);
+
+    }
   }
 
 
   private void onCheckedRadioChangeSearch(String inputText) {
     switch (fromStatus) {
       case ENGLISH:
-        showingWordList = repository.searchEnglishWordByInitial(inputText);
-        Collections.sort(showingWordList, new Comparator<Word>() {
-          @Override
-          public int compare(Word word1, Word word2) {
-            String s1 = word1.getText();
-            String s2 = word2.getText();
-            return s1.compareToIgnoreCase(s2);
-          }
-        });
+        searchedByInitialList = repository.searchEnglishWordByInitial(inputText);
+        sortWordList(searchedByInitialList);
+
         break;
       case PERSIAN:
-        showingWordList = repository.searchPersianWordByInitial(inputText);
-        Collections.sort(showingWordList, new Comparator<Word>() {
-          @Override
-          public int compare(Word word1, Word word2) {
-            String s1 = word1.getText();
-            String s2 = word2.getText();
-            return s1.compareToIgnoreCase(s2);
-          }
-        });
+        searchedByInitialList = repository.searchPersianWordByInitial(inputText);
+        sortWordList(searchedByInitialList);
         break;
       case SPANISH:
-        showingWordList = repository.searchSpanishWordByInitial(inputText);
-        Collections.sort(showingWordList, new Comparator<Word>() {
-          @Override
-          public int compare(Word word1, Word word2) {
-            String s1 = word1.getText();
-            String s2 = word2.getText();
-            return s1.compareToIgnoreCase(s2);
-          }
-        });
+        searchedByInitialList = repository.searchSpanishWordByInitial(inputText);
+        sortWordList(searchedByInitialList);
 
     }
     setupWordAdapter();
   }// end of onCheckedRadioChangeSearch()
+
+
+  private void sortWordList(List<Word> wordList) {
+    Collections.sort(wordList, new Comparator<Word>() {
+      @Override
+      public int compare(Word word1, Word word2) {
+        String s1 = word1.getText();
+        String s2 = word2.getText();
+        return s1.compareToIgnoreCase(s2);
+      }
+    });
+  }// end of sortWordList()
 
 
   private void findViews(View view) {
@@ -250,12 +248,24 @@ public class WordsListShowFragment extends Fragment {
   private List<Word> searchTheWordList(String searchString) {
     int length = searchString.length();
     List<Word> words = new ArrayList<>();
-    for (Word word : showingWordList) {
-      String subString = word.getTextSubstring(length);
-      if (subString.equals(searchString.toLowerCase())) {
-        words.add(word);
+    for (Word word : searchedByInitialList) {
+      try {
+        String subString = word.getTextSubstring(length);
+        if (subString.equals(searchString.toLowerCase())) {
+          words.add(word);
+        }
+      } catch (StringIndexOutOfBoundsException e) {
+        e.getCause();
       }
     }
+    Collections.sort(words, new Comparator<Word>() {
+      @Override
+      public int compare(Word word1, Word word2) {
+        String s1 = word1.getText();
+        String s2 = word2.getText();
+        return s1.compareToIgnoreCase(s2);
+      }
+    });
 
     return words;
   }// end of searchTheWordList()
@@ -294,8 +304,13 @@ public class WordsListShowFragment extends Fragment {
           return true;
         }
       });
-    }
+    } // end of WordViewHolder()
 
+
+    public void bindeWord(Word word) {
+      currentWord = word;
+      wordShowTxt.setText(word.getText());
+    }
 
     private UUID getToStatusUUID() {
       UUID translationId = null;
@@ -309,9 +324,6 @@ public class WordsListShowFragment extends Fragment {
           translationId = word.getSpanishTranslationId();
 
         }
-      } else if (fromStatus.equals(FromStatus.ENGLISH) && toStatus.equals(ToStatus.ENGLISH)) {
-        EnglishWord word = (EnglishWord) currentWord;
-
       } else if (fromStatus.equals(FromStatus.PERSIAN) && !toStatus.equals(ToStatus.PERSIAN)) {
         PersianWord word = (PersianWord) currentWord;
         if (toStatus.equals(ToStatus.ENGLISH)) {
@@ -321,9 +333,6 @@ public class WordsListShowFragment extends Fragment {
           translationId = word.getSpanishTranslationId();
 
         }
-      } else if (fromStatus.equals(FromStatus.PERSIAN) && toStatus.equals(ToStatus.PERSIAN)) {
-        PersianWord word = (PersianWord) currentWord;
-
       } else if (fromStatus.equals(FromStatus.SPANISH) && !toStatus.equals(ToStatus.SPANISH)) {
         SpanishWord word = (SpanishWord) currentWord;
         if (toStatus.equals(ToStatus.PERSIAN)) {
@@ -333,17 +342,10 @@ public class WordsListShowFragment extends Fragment {
           translationId = word.getEnglishTranslationId();
 
         }
-      } else if (fromStatus.equals(FromStatus.SPANISH) && toStatus.equals(ToStatus.SPANISH)) {
-        SpanishWord word = (SpanishWord) currentWord;
       }
       return translationId;
     }// end of getToStatusUUID()
 
-
-    public void bindeWord(Word word) {
-      currentWord = word;
-      wordShowTxt.setText(word.getText());
-    }
   }// end of WordViewHolder{}
 
 
@@ -368,6 +370,7 @@ public class WordsListShowFragment extends Fragment {
 
     @Override
     public void onBindViewHolder(@NonNull WordViewHolder wordViewHolder, int i) {
+      wordViewHolder.setIsRecyclable(false);
       Word word = wordList.get(i);
       wordViewHolder.bindeWord(word);
     }

@@ -137,6 +137,7 @@ public class Repository {
         cursorWrapper.close();
       }
     }
+
     return foundWords;
   }
 
