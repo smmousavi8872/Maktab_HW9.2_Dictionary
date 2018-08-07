@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +89,12 @@ public class WordsListShowFragment extends Fragment {
 
 
   @Override
+  public void onResume() {
+    super.onResume();
+    initializeList();
+  }
+
+  @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     repository = Repository.getInstance(getActivity());
@@ -107,6 +114,8 @@ public class WordsListShowFragment extends Fragment {
     radioGroupFrom.check(R.id.from_english_radio);
     radioGroupTo.check(R.id.to_persian_radio);
 
+    initializeList();
+
     addWordFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -119,48 +128,18 @@ public class WordsListShowFragment extends Fragment {
     radioGroupFrom.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        switch (checkedId) {
-          case R.id.from_english_radio:
-            String inputText = searchEdt.getText().toString().toLowerCase();
-            fromStatus = FromStatus.ENGLISH;
-            from = getString(R.string.english_language_name);
-            updateWordList(inputText);
-            onCheckedRadioChangeSearch(inputText);
-            break;
-          case R.id.from_persian_radio:
-            inputText = searchEdt.getText().toString().toLowerCase();
-            fromStatus = FromStatus.PERSIAN;
-            from = getString(R.string.persian_language_name);
-            updateWordList(inputText);
-            onCheckedRadioChangeSearch(inputText);
-            break;
-          case R.id.from_spanish_radio:
-            inputText = searchEdt.getText().toString().toLowerCase();
-            fromStatus = FromStatus.SPANISH;
-            from = getString(R.string.spanish_language_name);
-            updateWordList(inputText);
-            onCheckedRadioChangeSearch(inputText);
-            break;
-        }
+        radioGroupFromActions(checkedId);
+        if (searchEdt.getText().toString().equals(""))
+          initializeList();
+
       }
     });
 
     radioGroupTo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        switch (checkedId) {
-          case R.id.to_english_radio:
-            toStatus = ToStatus.ENGLISH;
-            to = getString(R.string.english_language_name);
-            break;
-          case R.id.to_persian_radio:
-            toStatus = ToStatus.PERSIAN;
-            to = getString(R.string.persian_language_name);
-            break;
-          case R.id.to_spanish_radio:
-            toStatus = ToStatus.SPANISH;
-            to = getString(R.string.spanish_language_name);
-        }
+        radioGroupToActions(checkedId);
+
       }
     });
 
@@ -184,14 +163,81 @@ public class WordsListShowFragment extends Fragment {
 
       }
     });
+
     return view;
+  }// end of onCreateView()
+
+
+  private void initializeList() {
+    switch (fromStatus) {
+      case ENGLISH:
+        showingWordList = repository.getEnglishWordList();
+        Log.i("TAG9", "size: " + showingWordList.size());
+        sortWordList(showingWordList);
+        break;
+      case PERSIAN:
+        showingWordList = repository.getPersianWordList();
+        Log.i("TAG9", "size: " + showingWordList.size());
+        sortWordList(showingWordList);
+        break;
+      case SPANISH:
+        showingWordList = repository.getSpanishWordList();
+        Log.i("TAG9", "size: " + showingWordList.size());
+        sortWordList(showingWordList);
+    }
+    setupWordAdapter();
   }
 
 
-  private void updateWordList(String inputText) {
+  private void radioGroupToActions(int checkedId) {
+    switch (checkedId) {
+      case R.id.to_english_radio:
+        toStatus = ToStatus.ENGLISH;
+        to = getString(R.string.english_language_name);
+        break;
+      case R.id.to_persian_radio:
+        toStatus = ToStatus.PERSIAN;
+        to = getString(R.string.persian_language_name);
+        break;
+      case R.id.to_spanish_radio:
+        toStatus = ToStatus.SPANISH;
+        to = getString(R.string.spanish_language_name);
+    }
+  }
+
+
+  private void radioGroupFromActions(int checkedId) {
+    switch (checkedId) {
+      case R.id.from_english_radio:
+        String inputText = searchEdt.getText().toString().toLowerCase();
+        fromStatus = FromStatus.ENGLISH;
+        from = getString(R.string.english_language_name);
+        updateWordList(inputText);
+        onCheckedRadioChangeSearch(inputText);
+        break;
+      case R.id.from_persian_radio:
+        inputText = searchEdt.getText().toString().toLowerCase();
+        fromStatus = FromStatus.PERSIAN;
+        from = getString(R.string.persian_language_name);
+        updateWordList(inputText);
+        onCheckedRadioChangeSearch(inputText);
+        break;
+      case R.id.from_spanish_radio:
+        inputText = searchEdt.getText().toString().toLowerCase();
+        fromStatus = FromStatus.SPANISH;
+        from = getString(R.string.spanish_language_name);
+        updateWordList(inputText);
+        onCheckedRadioChangeSearch(inputText);
+        break;
+    }
+  }
+
+
+  public void updateWordList(String inputText) {
     if (inputText.length() == 0) {
       showingWordList = new ArrayList<>();
       searchedByInitialList = new ArrayList<>();
+      initializeList();
 
     } else if (inputText.length() == 1) {
       onCheckedRadioChangeSearch(inputText);

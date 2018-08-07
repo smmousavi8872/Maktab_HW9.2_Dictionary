@@ -78,11 +78,30 @@ public class Repository {
   }
 
 
-  public List<Word> searchPersianWordByInitial(String englishInitial) {
+  public List<Word> searchPersianWordByInitial(String persianInitail) {
     List<Word> foundWords = new ArrayList<>();
     String whereClause = PersianWordTable.Cols.INITIAL_CHAR + " = ? ";
-    String[] whereArgs = {englishInitial};
+    String[] whereArgs = {persianInitail};
     PersianCursorWrapper cursorWrapper = (PersianCursorWrapper) getQuery(PersianWordTable.NAME, whereClause, whereArgs);
+
+    if (cursorWrapper.getCount() > 0) {
+      try {
+        cursorWrapper.moveToFirst();
+        while (!cursorWrapper.isAfterLast()) {
+          foundWords.add(cursorWrapper.getPersianWord());
+          cursorWrapper.moveToNext();
+        }
+      } finally {
+        cursorWrapper.close();
+      }
+    }
+    return foundWords;
+  }
+
+
+  public List<Word> getPersianWordList() {
+    List<Word> foundWords = new ArrayList<>();
+    PersianCursorWrapper cursorWrapper = (PersianCursorWrapper) getQuery(PersianWordTable.NAME, null, null);
 
     if (cursorWrapper.getCount() > 0) {
       try {
@@ -120,11 +139,50 @@ public class Repository {
   }
 
 
-  public List<Word> searchSpanishWordByInitial(String englishInitial) {
+  public List<Word> getEnglishWordList() {
+    List<Word> foundWords = new ArrayList<>();
+    EnglishCursorWrapper cursorWrapper = (EnglishCursorWrapper) getQuery(EnglishWordTable.NAME, null, null);
+
+    if (cursorWrapper.getCount() > 0) {
+      try {
+        cursorWrapper.moveToFirst();
+        while (!cursorWrapper.isAfterLast()) {
+          foundWords.add(cursorWrapper.getEnglishWord());
+          cursorWrapper.moveToNext();
+        }
+      } finally {
+        cursorWrapper.close();
+      }
+    }
+    return foundWords;
+  }
+
+
+  public List<Word> searchSpanishWordByInitial(String spanishInitial) {
     List<Word> foundWords = new ArrayList<>();
     String whereClause = SpanishWordTable.Cols.INITIAL_CHAR + " = ? ";
-    String[] whereArgs = {englishInitial};
+    String[] whereArgs = {spanishInitial};
     SpanishCursorWrapper cursorWrapper = (SpanishCursorWrapper) getQuery(SpanishWordTable.NAME, whereClause, whereArgs);
+
+    if (cursorWrapper.getCount() > 0) {
+      try {
+        cursorWrapper.moveToFirst();
+        while (!cursorWrapper.isAfterLast()) {
+          foundWords.add(cursorWrapper.getSpanishWord());
+          cursorWrapper.moveToNext();
+        }
+      } finally {
+        cursorWrapper.close();
+      }
+    }
+
+    return foundWords;
+  }
+
+
+  public List<Word> getSpanishWordList() {
+    List<Word> foundWords = new ArrayList<>();
+    SpanishCursorWrapper cursorWrapper = (SpanishCursorWrapper) getQuery(SpanishWordTable.NAME, null, null);
 
     if (cursorWrapper.getCount() > 0) {
       try {
